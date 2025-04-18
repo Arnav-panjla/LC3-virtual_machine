@@ -41,6 +41,7 @@ fn main() {
             OpCode::ADD => opcode::handle_add(instr, &mut registers),
             OpCode::AND => opcode::handle_and(instr, &mut registers),
             OpCode::NOT => opcode::handle_not(instr, &mut registers),
+            OpCode::BR => opcode::handle_br(instr, &mut registers),
             OpCode::TRAP => {
                 let cont = trapcode::handle_trap(instr, &mut memory, &mut registers);
                 if !cont {
