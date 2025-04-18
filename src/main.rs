@@ -41,16 +41,29 @@ fn main() {
             OpCode::ADD => opcode::handle_add(instr, &mut registers),
             OpCode::AND => opcode::handle_and(instr, &mut registers),
             OpCode::NOT => opcode::handle_not(instr, &mut registers),
-            OpCode::BR => opcode::handle_br(instr, &mut registers),
+            OpCode::BR => opcode::handle_br(instr, &mut registers), //Break
+            OpCode::JSR => opcode::handle_jsr(instr, &mut registers), // Jump register
+            OpCode::LD => opcode::handle_ld(instr, &mut memory, &mut registers), // Load
+            OpCode::LDR => opcode::handle_ldr(instr, &mut memory, &mut registers), // Load register
+            OpCode::ST => opcode::handle_st(instr, &mut memory, &mut registers), // Store
+            OpCode::JMP => opcode::handle_jmp(instr, &mut registers), // Jump
+            OpCode::LEA => opcode::handle_lea(instr, &mut memory, &mut registers), // Load effective address
+            OpCode::STI => opcode::handle_sti(instr, &mut memory, &mut registers), // Store indirect
+            OpCode::LDI => opcode::handle_ldi(instr, &mut memory, &mut registers), // Load indirect
+            OpCode::STR => opcode::handle_str(instr, &mut memory, &mut registers), // Store register
+            OpCode::RTI => {
+                println!("RTI not implemented");
+                break 'exec;
+            }
+            OpCode::RES => {
+                println!("RES not implemented");
+                break 'exec;
+            }
             OpCode::TRAP => {
                 let cont = trapcode::handle_trap(instr, &mut memory, &mut registers);
                 if !cont {
                     break 'exec;
                 }
-            }
-            _ => {
-                println!("Unimplemented opcode: {:?}", opcode);
-                break 'exec;
             }
         }
     }
