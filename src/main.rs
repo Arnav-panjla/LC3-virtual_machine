@@ -4,7 +4,8 @@ mod trapcode;
 mod utils;
 mod opcode;
 
-use termion::prelude::*;
+use termion::{clear, raw::IntoRawMode};
+use std::io::{stdout, Write};
 use memory::Memory;
 use register::Registers;
 use opcode::OpCode;
@@ -47,7 +48,7 @@ fn main() {
                 }
             }
             _ => {
-\                println!("Unimplemented opcode: {:?}", opcode);
+                println!("Unimplemented opcode: {:?}", opcode);
                 break 'exec;
             }
         }

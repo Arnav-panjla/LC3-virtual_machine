@@ -1,67 +1,59 @@
-use crate::register::Registers;
-use crate::utils::{sign_extend, update_flags};
+use crate::{register::Registers, utils};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug)]
 #[repr(u16)]
 pub enum OpCode {
     BR = 0,
-    ADD,
-    LD,
-    ST,
-    JSR,
-    AND,
-    LDR,
-    STR,
-    RTI,
-    NOT,
-    LDI,
-    STI,
-    JMP,
-    RES,
-    LEA,
-    TRAP,
+    ADD = 1,
+    LD = 2,
+    ST = 3,
+    JSR = 4,
+    AND = 5,
+    LDR = 6,
+    STR = 7,
+    RTI = 8,
+    NOT = 9,
+    LDI = 10,
+    STI = 11,
+    JMP = 12,
+    RES = 13,
+    LEA = 14,
+    TRAP = 15,
 }
 
 impl OpCode {
     pub fn from_instr(instr: u16) -> Self {
-        let op = (instr >> 12) & 0xF;
-        unsafe { std::mem::transmute(op as u16) }
+        match (instr >> 12) & 0xF {
+            0 => OpCode::BR,
+            1 => OpCode::ADD,
+            2 => OpCode::LD,
+            3 => OpCode::ST,
+            4 => OpCode::JSR,
+            5 => OpCode::AND,
+            6 => OpCode::LDR,
+            7 => OpCode::STR,
+            8 => OpCode::RTI,
+            9 => OpCode::NOT,
+            10 => OpCode::LDI,
+            11 => OpCode::STI,
+            12 => OpCode::JMP,
+            13 => OpCode::RES,
+            14 => OpCode::LEA,
+            15 => OpCode::TRAP,
+            _ => OpCode::RES,
+        }
     }
 }
 
-pub fn handle_add(instr: u16, registers: &mut Registers) {
-    let dr = (instr >> 9) & 0x7;
-    let sr1 = (instr >> 6) & 0x7;
-    if (instr >> 5) & 0x1 == 1 { // immediate mode 
-        let imm5 = sign_extend(instr & 0x1F, 5);
-        let res = registers.read(sr1).wrapping_add(imm5);
-        registers.write(dr, res);
-    } else { // register mode
-        let sr2 = instr & 0x7;
-        let res = registers.read(sr1).wrapping_add(registers.read(sr2));
-        registers.write(dr, res);
-    }
-    update_flags(registers, dr);
+// Implement opcode logic stubs here:
+pub fn handle_add(instr: u16, reg: &mut Registers) {
+
 }
 
-pub fn handle_and(instr: u16, registers: &mut Registers) {
-    let dr = (instr >> 9) & 0x7;
-    let sr1 = (instr >> 6) & 0x7;
-    if (instr >> 5) & 0x1 == 1 {
-        let imm5 = sign_extend(instr & 0x1F, 5);
-        let res = registers.read(sr1) & imm5;
-        registers.write(dr, res);
-    } else {
-        let sr2 = instr & 0x7;
-        let res = registers.read(sr1) & registers.read(sr2);
-        registers.write(dr, res);
-    }
-    update_flags(registers, dr);
+pub fn handle_and(instr: u16, reg: &mut Registers) {
+
 }
 
-pub fn handle_not(instr: u16, registers: &mut Registers) {
-    let dr = (instr >> 9) & 0x7;
-    let sr = (instr >> 6) & 0x7;
-    registers.write(dr, !registers.read(sr));
-    update_flags(registers, dr);
+pub fn handle_not(instr: u16, reg: &mut Registers) {
+    
 }
