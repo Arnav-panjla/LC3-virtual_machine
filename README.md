@@ -1,4 +1,4 @@
-# Little Ccomputer 3 Virtual machine (LC3VM)
+# Little Computer 3 Virtual machine (LC3VM)
 
 Rust implementation of VM that executes LC3 instructions.
 

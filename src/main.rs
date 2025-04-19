@@ -18,8 +18,8 @@ fn main() {
     write!(stdout, "{}", termion::clear::All).unwrap();
     stdout.flush().unwrap();
     
-    write!(stdout, "LC3 Virtual Machine\n").unwrap();
-    write!(stdout, "Press Ctrl+C to exit.\n").unwrap();
+    write!(stdout, "LC3 Virtual Machine\r\n").unwrap();
+    write!(stdout, "Press Ctrl+C to exit.\r\n").unwrap();
     stdout.flush().unwrap();
 
     let mut memory = Memory::new();
