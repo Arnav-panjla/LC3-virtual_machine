@@ -6,5 +6,10 @@ Reference: https://www.jmeiners.com/lc3-vm/
 
 ## How to run??
 
-Runs for unix based systems
+Runs for unix based systems, make file exists for a reason
+
+- run 2048.obj
+```bash
+make run_2048
+```
 

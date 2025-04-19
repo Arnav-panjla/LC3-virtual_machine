@@ -1,9 +1,9 @@
 
 
-run: build
+run_2048: build
 	./target/release/lc3_vm ./samples/2048.obj
 
-build:
+build: clean
 	cargo build --release
 	@echo "Build complete. Run with ./target/release/lc3_vm ./sample/2048.obj"
 clean:
