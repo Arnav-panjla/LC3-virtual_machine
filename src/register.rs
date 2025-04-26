@@ -33,7 +33,7 @@ impl Registers {
         let val = self.regs[r];
         self.cond = if val == 0 {
             ConditionFlag::ZRO
-        } else if (val >> 15) == 1 {
+        } else if (val >> 15) != 0 {
             ConditionFlag::NEG
         } else {
             ConditionFlag::POS
@@ -50,9 +50,6 @@ impl Registers {
 
     pub fn increment_pc(&mut self) {
         self.pc = self.pc.wrapping_add(1);
-    }
-    pub fn get_cond(&self) -> ConditionFlag {
-        self.cond
     }
     pub fn get_cond_flag(&self) -> u16 {
         match self.cond {
