@@ -29,20 +29,17 @@ impl Memory {
         let mut contents = Vec::new();
         file.read_to_end(&mut contents)?;
         
-        // Check if first two bytes could be a valid origin address
         let origin = if contents.len() >= 2 {
             u16::from_be_bytes([contents[0], contents[1]])
         } else {
-            // Default to standard PC_START if file is too short
             0x3000
         };
         
-        // If origin looks invalid (not in reasonable range), assume file has no header
         let (start_offset, mem_offset) = if origin >= 0x3000 && origin <= 0x9000 {
-            // Normal file with header
+            // with header
             (2, origin as usize)
         } else {
-            // No header, assume PC_START
+            // no header
             (0, 0x3000)
         };
         
@@ -58,5 +55,43 @@ impl Memory {
         }
         
         Ok(())
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_load_program_with_header() {
+        let mut mem = Memory::new();
+
+        let binary: Vec<u8> = vec![
+            0x40, 0x00, // origin = 0x4000
+            0x12, 0x34, // instruction 1
+            0xAB, 0xCD  // instruction 2
+        ];
+
+        std::fs::write("test_prog_with_header.obj", &binary).unwrap();
+        mem.load_program("test_prog_with_header.obj").unwrap();
+
+        assert_eq!(mem.read(0x4000), 0x1234);
+        assert_eq!(mem.read(0x4001), 0xABCD);
+    }
+
+    #[test]
+    fn test_load_program_without_header() {
+        let mut mem = Memory::new();
+
+        let binary: Vec<u8> = vec![
+            0x12, 0x34,
+            0x56, 0x78
+        ];
+
+        std::fs::write("test_prog_no_header.obj", &binary).unwrap();
+        mem.load_program("test_prog_no_header.obj").unwrap();
+
+        assert_eq!(mem.read(0x3000), 0x1234);
+        assert_eq!(mem.read(0x3001), 0x5678);
     }
 }

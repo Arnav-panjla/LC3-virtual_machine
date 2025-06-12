@@ -5,4 +5,12 @@ edition = "2021"
 
 [dependencies]
 termion = "4.0.5"
-signal-hook ="0.3.17"
+signal-hook = "0.3"
+
+[[bin]]
+name = "lc3_vm"
+path = "src/main.rs"
+
+[lib]
+name = "lc3_vm"
+path = "src/main.rs"

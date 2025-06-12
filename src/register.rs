@@ -59,3 +59,40 @@ impl Registers {
         }
     }
 }
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_register_get_set() {
+        let mut regs = Registers::new();
+        regs.set(3, 0xABCD);
+        assert_eq!(regs.get(3), 0xABCD);
+    }
+
+    #[test]
+    fn test_update_flags_positive() {
+        let mut regs = Registers::new();
+        regs.set(4, 0x1234);  // Normal positive value
+        assert_eq!(regs.get_cond_flag(), 1);
+    }
+
+    #[test]
+    fn test_program_counter_set_get() {
+        let mut regs = Registers::new();
+        regs.set_pc(0x3000);
+        assert_eq!(regs.get_pc(), 0x3000);
+    }
+
+    #[test]
+    fn test_program_counter_increment() {
+        let mut regs = Registers::new();
+        regs.set_pc(0xFFFF);
+        regs.increment_pc();
+        assert_eq!(regs.get_pc(), 0x0000);  // wrapping around
+    }
+}
+

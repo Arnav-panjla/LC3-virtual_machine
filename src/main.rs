@@ -4,11 +4,11 @@
 //! the LC-3 virtual machine. It handles loading programs, processing instructions,
 //! and interfacing with the terminal in raw mode for proper I/O operations.
 
-mod memory;
-mod register;
-mod trapcode;
-mod utils;
-mod opcode;
+pub mod memory;
+pub mod register;
+pub mod trapcode;
+pub mod utils;
+pub mod opcode;
 
 use memory::Memory;
 use register::Registers;
@@ -47,6 +47,7 @@ impl<T: termion::raw::IntoRawMode> Drop for TerminalGuard<T> {
 /// 2. Registers signal handlers and panic hooks for clean termination
 /// 3. Loads a program from a file specified as a command-line argument
 /// 4. Runs the main instruction execution loop until program termination
+#[allow(dead_code)]
 fn main() {
     // Set panic hook to ensure terminal is restored on panic
     let original_hook = panic::take_hook();
