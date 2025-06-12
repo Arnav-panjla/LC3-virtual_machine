@@ -9,3 +9,6 @@ build: clean
 clean:
 	cargo clean
 	@echo "Cleaned build artifacts."
+
+run : build
+	./target/release/lc3_vm ./samples/test.obj
