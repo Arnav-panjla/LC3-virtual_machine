@@ -11,4 +11,4 @@ clean:
 	@echo "Cleaned build artifacts."
 
 run : build
-	./target/release/lc3_vm ./samples/test.obj
+	./target/release/lc3_vm ./samples/test1.obj

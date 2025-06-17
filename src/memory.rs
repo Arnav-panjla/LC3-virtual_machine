@@ -24,7 +24,7 @@ impl Memory {
         }
     }
 
-    pub fn load_program(&mut self, path: &str) -> Result<()> {
+    pub fn load_program(&mut self, path: &str, mut pc: u16) -> Result<()> {
         let mut file = File::open(path)?;
         let mut contents = Vec::new();
         file.read_to_end(&mut contents)?;
@@ -40,8 +40,12 @@ impl Memory {
             (2, origin as usize)
         } else {
             // no header
-            (0, 0x3000)
+            (0, 0x3000 as usize)
         };
+
+        pc = mem_offset
+            .try_into()
+            .unwrap_or(0x3000);
         
         // Load instructions
         for i in (start_offset..contents.len()).step_by(2) {
@@ -65,6 +69,7 @@ mod tests {
     #[test]
     fn test_load_program_with_header() {
         let mut mem = Memory::new();
+        let pc = 0x3000;
 
         let binary: Vec<u8> = vec![
             0x40, 0x00, // origin = 0x4000
@@ -73,7 +78,7 @@ mod tests {
         ];
 
         std::fs::write("test_prog_with_header.obj", &binary).unwrap();
-        mem.load_program("test_prog_with_header.obj").unwrap();
+        mem.load_program("test_prog_with_header.obj", pc).unwrap();
 
         assert_eq!(mem.read(0x4000), 0x1234);
         assert_eq!(mem.read(0x4001), 0xABCD);
@@ -82,6 +87,7 @@ mod tests {
     #[test]
     fn test_load_program_without_header() {
         let mut mem = Memory::new();
+        let pc = 0x3000;
 
         let binary: Vec<u8> = vec![
             0x12, 0x34,
@@ -89,7 +95,7 @@ mod tests {
         ];
 
         std::fs::write("test_prog_no_header.obj", &binary).unwrap();
-        mem.load_program("test_prog_no_header.obj").unwrap();
+        mem.load_program("test_prog_no_header.obj", pc).unwrap();
 
         assert_eq!(mem.read(0x3000), 0x1234);
         assert_eq!(mem.read(0x3001), 0x5678);

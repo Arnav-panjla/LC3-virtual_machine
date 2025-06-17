@@ -22,46 +22,18 @@ use std::panic;
 use std::thread;
 use signal_hook::{iterator::Signals, consts::SIGINT};
 
-/// The starting memory address for LC-3 programs
-const PC_START: u16 = 0x3000;
 
-/// A guard struct that ensures terminal settings are properly restored
-/// when the program exits, even in case of panics or crashes
-struct TerminalGuard <T : termion::raw::IntoRawMode> {
-    /// The raw terminal instance being protected
-    terminal: T,
-}
 
-impl<T: termion::raw::IntoRawMode> Drop for TerminalGuard<T> {
-    /// Restores terminal settings when the guard goes out of scope
-    fn drop(&mut self) {
-        // Simply dropping the terminal will restore the previous terminal mode
-        // as RawTerminal implements Drop
-    }
-}
-
-/// The main entry point for the LC-3 virtual machine
-///
-/// This function:
-/// 1. Sets up terminal handling in raw mode
-/// 2. Registers signal handlers and panic hooks for clean termination
-/// 3. Loads a program from a file specified as a command-line argument
-/// 4. Runs the main instruction execution loop until program termination
-#[allow(dead_code)]
 fn main() {
-    // Set panic hook to ensure terminal is restored on panic
+
     let original_hook = panic::take_hook();
     panic::set_hook(Box::new(move |panic_info| {
-        // Restore terminal settings before displaying panic information
         let _ = stdout().into_raw_mode().unwrap().suspend_raw_mode();
         original_hook(panic_info);
     }));
     
-    // Create guarded terminal to ensure settings are restored on exit
-    let stdout = stdout_main().into_raw_mode().unwrap();
-    let mut raw_stdout = TerminalGuard { terminal: stdout };
     
-    // Set up signal handler for Ctrl+C (SIGINT)
+    let mut raw_stdout = stdout_main().into_raw_mode().unwrap();
     let mut signals = Signals::new(&[SIGINT]).expect("Failed to register signal handler");
     thread::spawn(move || {
         for _ in signals.forever() {
@@ -72,33 +44,25 @@ fn main() {
         }
     });
 
-    // Display welcome message
-    write!(raw_stdout.terminal, "LC3 Virtual Machine\r\n").unwrap();
-    write!(raw_stdout.terminal, "Press Ctrl+C to exit.\r\n").unwrap();
-    raw_stdout.terminal.flush().unwrap();
+    write!(raw_stdout, "LC3 Virtual Machine\r\n").unwrap();
+    raw_stdout.flush().unwrap();
 
-    // Initialize VM memory and registers
     let mut memory = Memory::new();
     let mut registers = Registers::new();
+    let pc : u16 = 0x3000;
 
-    // Load program from command line argument
     let program_path = std::env::args().nth(1).expect("Usage: lc3vm <program.obj>");
-    memory.load_program(&program_path).expect("Failed to load program");
+    memory.load_program(&program_path, pc).expect("Failed to load program");
 
-    // Set program counter to standard LC-3 program start address
-    registers.set_pc(PC_START);
+    registers.set_pc(pc);
 
-    // Main execution loop - fetch, decode, execute cycle
     'exec: loop {
-        // Fetch: Get the current instruction from memory
         let pc = registers.get_pc();
         let instr = memory.read(pc);
         registers.increment_pc();
 
-        // Decode: Extract the opcode from the instruction
         let opcode = OpCode::from_instr(instr);
 
-        // Execute: Process the instruction based on its opcode
         match opcode {
             OpCode::ADD => opcode::handle_add(instr, &mut registers),
             OpCode::AND => opcode::handle_and(instr, &mut registers),
@@ -114,18 +78,15 @@ fn main() {
             OpCode::LDI => opcode::handle_ldi(instr, &mut memory, &mut registers),
             OpCode::STR => opcode::handle_str(instr, &mut memory, &mut registers),
             OpCode::RTI => {
-                // Return from interrupt - not implemented in this VM
                 println!("RTI not implemented");
                 break 'exec;
             }
             OpCode::RES => {
-                // Reserved instruction - not implemented
                 println!("RES not implemented");
                 break 'exec;
             }
             OpCode::TRAP => {
-                // System call - handle and check if execution should continue
-                let cont = trapcode::handle_trap(instr, &mut memory, &mut registers, &mut raw_stdout.terminal);
+                let cont = trapcode::handle_trap(instr, &mut memory, &mut registers, &mut raw_stdout);
                 if !cont {
                     break 'exec;
                 }
