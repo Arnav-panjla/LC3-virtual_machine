@@ -1,6 +1,5 @@
 use crate::{register::Registers, utils, Memory};
 
-/// Represents the operation codes for the LC3 instruction set
 #[derive(Debug)]
 #[repr(u16)]
 pub enum OpCode {
@@ -23,17 +22,8 @@ pub enum OpCode {
 }
 
 impl OpCode {
-    /// Extracts the opcode from an instruction
-    /// 
-    /// # Arguments
-    ///
-    /// * `instr` - A 16-bit instruction word
-    ///
-    /// # Returns
-    ///
-    /// The opcode enum value corresponding to the instruction
     pub fn from_instr(instr: u16) -> Self {
-        match (instr >> 12) & 0xF {
+        match instr >> 12 {
             0 => OpCode::BR,
             1 => OpCode::ADD,
             2 => OpCode::LD,

@@ -15,7 +15,11 @@ make run_2048
 
 ### why it works ? - - magic!!!
 
+![](./assets/lc3_diagram.png)
+
 **“The view that machines cannot give rise to surprises is due, I believe, to a fallacy to which philosophers and mathematicians are particularly subject. This is the assumption that as soon as a fact is presented to a mind all consequences of that fact spring into the mind simultaneously with it. It is a very useful assumption under many circumstances, but one too easily forgets that it is false.”** — Alan M. Turing
+
+
 
 ## Opcodes
 ###  1. BR – Branch
